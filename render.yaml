@@ -1,11 +1,57 @@
-render.yaml
+services:
+  - type: web
+    name: bestbuy-bot-api
+    runtime: node
+    plan: starter
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bestbuy-bot-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CHAT_MODEL
+        value: gpt-4.1-mini
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
+      - key: RINGCENTRAL_CLIENT_ID
+        sync: false
+      - key: RINGCENTRAL_CLIENT_SECRET
+        sync: false
+      - key: RINGCENTRAL_SERVER_URL
+        value: https://platform.ringcentral.com
+      - key: RINGCENTRAL_JWT
+        sync: false
+      - key: WEBHOOK_VALIDATION_TOKEN
+        sync: false
 
-package.json
+  - type: worker
+    name: bestbuy-bot-worker
+    runtime: node
+    plan: starter
+    rootDir: .
+    buildCommand: npm install
+    startCommand: node worker-runner.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bestbuy-bot-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
 
-server.js
-
-worker-runner.js
-
-schema.sql
-
-SETUP.md
+databases:
+  - name: bestbuy-bot-db
+    plan: starter
